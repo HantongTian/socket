@@ -20,6 +20,7 @@
 
 
 #include <sys/socket.h>
+#include <sys/types.h>
 #include <unistd.h>
 #include <errno.h>
 #include <stdio.h>
@@ -31,6 +32,9 @@ enum socketType
 };
 
 int CreateSocket(enum socketType protocal);
+
+//Create a tcp server socket
+int CreateTcpServerSocket(const char *service);
 
 int TcpConnect(int sock, const char *serverIP, const int port);
 

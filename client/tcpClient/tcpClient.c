@@ -98,6 +98,8 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 
+	close(g_iSock);
+
 	LogInfo("program return normal", LOG_INFO);
 	return 0;
 }
