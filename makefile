@@ -4,6 +4,7 @@ all : CHECK_DIR
 CHECK_DIR:ECHO
 	mkdir -p bin
 	make -C client
+	make -C server
 
 	@echo all compile completed
 

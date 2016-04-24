@@ -34,8 +34,9 @@ enum socketType
 int CreateSocket(enum socketType protocal);
 
 //Create a tcp server socket
-int CreateTcpServerSocket(const char *service);
+int CreateTcpServerSocket(const char * hostStr, const char *service);
 
 int TcpConnect(int sock, const char *serverIP, const int port);
 
+int AcceptTCPConnection(int serverSock);
 #endif

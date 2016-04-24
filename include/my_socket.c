@@ -77,21 +77,23 @@ int TcpConnect(int sock, const char *serverIP, const int port)
 }
 
 //
-//Create a tcp server socket 
-//in:service:server addr
+//Create a tcp server socket and bind port and listen
+//in:   hostStr:Domain name or ip address in ipv4,ipv6
+//		service:server addr
+//return: a tcp socket
 //
-int CreateTcpServerSocket(const char *service)
+int CreateTcpServerSocket(const char * hostStr, const char *service)
 {
 	//Construct the server address structure
 	struct addrinfo addrCriteria;	//Criteria for address match
-	memset(&addrCriteria, 0, sizeof(addrinfo));
+	memset(&addrCriteria, 0, sizeof(addrCriteria));
 	addrCriteria.ai_family = AF_UNSPEC;		//Any address family
 	addrCriteria.ai_flags = AI_PASSIVE;		//Accept on any address/port
 	addrCriteria.ai_socktype = SOCK_STREAM;	//only stream sockets
 	addrCriteria.ai_protocol = IPPROTO_TCP;	//only tcp protocol
 
 	struct addrinfo *servAddr;		//Storage list of server address
-	int iRet = getaddrinfo(NULL, service, &addrCriteria, &servAddr);
+	int iRet = getaddrinfo(hostStr, service, &addrCriteria, &servAddr);
 	if(0 != iRet)
 	{
 		LogInfo("getaddrinfo error", LOG_ERROR);
@@ -99,8 +101,8 @@ int CreateTcpServerSocket(const char *service)
 	}
 
 	int iSockfd = -1;
-	struct addrinfo *addr = servAddr;
-	for(; addr != NULL; addr = addr->ai_next)
+	struct addrinfo *addr = NULL;
+	for(addr = servAddr; addr != NULL; addr = addr->ai_next)
 	{
 		//Create a Tcp socket 
 		iSockfd = socket(addr->ai_family, addr->ai_socktype,\
@@ -136,13 +138,30 @@ int CreateTcpServerSocket(const char *service)
 			return -1;
 		}
 
-		fputs("Binding to", stdout);
-		fputs("\n", stdout);
-		
 		break;
 	}
 
 	freeaddrinfo(servAddr);
 
 	return 0;
+}
+
+//
+//Function: Accept a tcp connect
+//in:	a tcp server socket create by server
+//out:	a descriptor for the accept socket
+//
+int AcceptTCPConnection(int serverSock)
+{
+	struct sockaddr_storage clntAddr;	//Client address
+	//Set length of client address structure (in-out parameter)
+	socklen_t clntAddrLen = sizeof(clntAddr);
+
+	int clntSock = accept(serverSock, (struct sockaddr *) &clntAddr, &clntAddrLen);
+	if(0 > clntSock)
+	{
+		LogInfo("accept() error", LOG_ERROR);
+	}
+
+	return clntSock;
 }
