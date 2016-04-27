@@ -98,9 +98,51 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 
+	char sendBufer[1024];
+	char recvBuffer[1024];
+	ssize_t iNumSend = 0;
+	ssize_t numRecv;
+	while(1)
+	{	
+#if 1
+		printf("Input msg to be sent:");
+		scanf("%s", sendBufer);
+		iNumSend = send(g_iSock, sendBufer, strlen(sendBufer), 0);
+		if(iNumSend < 0)
+		{
+			LogInfo("send error", LOG_ERROR);
+			break;
+		}
+		else
+		{
+			if(iNumSend != strlen(sendBufer))
+			{
+				LogInfo("Unexpected number bytes be sent", LOG_ERROR);
+				break;
+			}
+		}
+#endif
+		memset(recvBuffer, 0, 1024);
+		numRecv = recv(g_iSock, recvBuffer, 1023, 0);
+		if(numRecv < 0)
+		{
+			LogInfo("recv error", LOG_ERROR);
+			break;
+		}
+		else
+		{
+			if(0 == numRecv)
+			{
+				LogInfo("recv number bytes is 0", LOG_ERROR);
+				break;
+			}
+		}
+		recvBuffer[numRecv] = '\0';
+		printf("recvBuffer is:[%s]\n", recvBuffer);
+	};
 	close(g_iSock);
 
-	LogInfo("program return normal", LOG_INFO);
+	LogInfo("program return now", LOG_INFO);
 	return 0;
 }
 

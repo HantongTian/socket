@@ -73,7 +73,7 @@ int TcpConnect(int sock, const char *serverIP, const int port)
 		return -1;
 	}
 
-	return 0;
+	return iRet;
 }
 
 //
@@ -143,7 +143,7 @@ int CreateTcpServerSocket(const char * hostStr, const char *service)
 
 	freeaddrinfo(servAddr);
 
-	return 0;
+	return iSockfd;
 }
 
 //

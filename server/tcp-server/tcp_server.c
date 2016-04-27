@@ -33,6 +33,7 @@ void Usage()
 	fprintf( stderr, "tcpServer  info\n" );
 	fprintf( stderr, "Options:\n" );
 	fprintf( stderr, "  -s, --serverIP    : Server IP \n" );
+	fprintf( stderr, "  -p, --port    : Server port to bind\n" );
 	fprintf( stderr, "  -h, --help        : This screen\n" );
 	fprintf( stderr, "  -v, --version     : Report the installed version of tcpclient\n" );		
 	exit( 0 );
@@ -66,7 +67,7 @@ int main(int argc, char *argv[])
 	{
 		int option_index = 0;
 
-		int c = getopt_long (argc, argv, "s:h:v", long_options, &option_index);
+		int c = getopt_long (argc, argv, "s:p:h:v", long_options, &option_index);
 		if (-1 == c)
 		{
 			break;
@@ -100,6 +101,9 @@ int main(int argc, char *argv[])
 				}
 			default:
 				//fprintf( stderr, "?? getopt returned character code 0%o ??\n", c );
+				{
+					Usage();
+				}
 				break;
 		}
 	}
@@ -153,10 +157,17 @@ int HandleTCPClient(int clntSock)
 	char buffer[BUF_SIZE];
 
 	ssize_t numRcvd = recv(clntSock, buffer, BUF_SIZE, 0);
+	if(numRcvd > 0)
+	{
+		buffer[numRcvd] = '\0';
+	}
 
 	while(numRcvd > 0)
 	{
-		char echoBuffer[100] = "The tcp server have recive a message\n";
+		char echoBuffer[100];
+		printf("Recive a msg:[%s]\n", buffer);
+		printf("Input msg to be sent:");
+		scanf("%s", echoBuffer);
 		ssize_t numSend = send(clntSock, buffer, strlen(echoBuffer), 0);
 		if(numSend < 0)
 		{
@@ -179,6 +190,7 @@ int HandleTCPClient(int clntSock)
 			LogInfo("recv failed", LOG_ERROR);
 			return -1;
 		}
+		buffer[numRcvd] = '\0';
 	};
 
 	close(clntSock);
